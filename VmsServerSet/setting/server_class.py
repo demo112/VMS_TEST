@@ -3,10 +3,6 @@ import paramiko
 import telnetlib
 
 
-def make_time():
-    pass
-
-
 class ServerSetCentOS:
     def __init__(self):
         self.hostname = '206.10.0.206'

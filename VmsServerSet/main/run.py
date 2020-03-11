@@ -1,4 +1,4 @@
-from setting.server_class import *
+from VmsServerSet.setting.server_class import *
 
 
 def run_update_centos_server():

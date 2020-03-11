@@ -27,9 +27,14 @@ def run_update_centos_server():
     cent.give_order("cd /root/AttendanceSys/;./server.sh status")
 
 
-def change_all_time():
+def change_all_time(time):
+    """
+    time-> 2008-08-08 08:08:08
+    :param time:
+    :return:
+    """
     time_list = [
-        '2008-12-14 05:05:05',
+        time,
     ]
 
     def t2t(date_time):
@@ -72,8 +77,20 @@ def change_all_time():
 def set_time_while(key: list, cfg):
     for o in cfg:
         for k in key:
-            print(o[k])
-
+            case = o[k].replace("/", "-")
+            print("%s为: %s" % (k, case))
+        for k in key:
+            case = o[k].replace("/", "-")
+            if "用例" in k:
+                print("-" * 88)
+            time.sleep(0.38)
+            if "上班" in k or "下班" in k:
+                flag_1 = input("是否将服务器时间修改为%s: %s" % (k, case))
+                flag_2 = input("请再次确认")
+                print("+" * 88)
+                if not flag_1 and not flag_2:
+                    # change_all_time(case)
+                    pass
 
 
 
@@ -87,4 +104,3 @@ if __name__ == '__main__':
     cfg = GetConfig()
     (a, b) = cfg.open_file()
     set_time_while(a, b)
-

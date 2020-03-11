@@ -1,5 +1,5 @@
 from VmsServerSet.setting.server_class import *
-
+from TestMatrix.main.config_manager import *
 
 def run_update_centos_server():
     """
@@ -69,7 +69,22 @@ def change_all_time():
             print(e)
 
 
+def set_time_while(key: list, cfg):
+    for o in cfg:
+        for k in key:
+            print(o[k])
+
+
+
+
+
 if __name__ == '__main__':
-    change_all_time()
+    # 修改所有设备时间，要求联通并打开对应设备的Telnet
+    # change_all_time()
+    # 自动升级考勤服务，要求，安装包上传至服务器，并尽量删除老版本服务
     # run_updateCentOS_server()
-    pass
+    # 循环修改设定好时间
+    cfg = GetConfig()
+    (a, b) = cfg.open_file()
+    set_time_while(a, b)
+

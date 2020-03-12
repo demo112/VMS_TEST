@@ -1,6 +1,7 @@
 from VmsServerSet.setting.server_class import *
 from TestMatrix.main.config_manager import *
 
+
 def run_update_centos_server():
     """
     自动升级
@@ -75,23 +76,50 @@ def change_all_time(time):
 
 
 def set_time_while(key: list, cfg):
+    """
+    根据用例设置服务器、一体机、人脸速通门的时间，配合测试
+    :param key:
+    :param cfg:
+    :return:
+    """
+
+    def effective(date):
+        """
+        在每条用例执行修改生效以后，对服务器进行过12点并重启
+        :param date:需要生成数据的考勤日期
+        :return:None
+        """
+        date_list = date.split(" ")[0].split("-")
+        date_list[2] = str(int(date_list[2]) + 1)
+        sc = ServerSetCentOS()
+        sc.run_change_time("%s-%s-%s 11:59:55" % (date_list[0], date_list[1], date_list[2]))
+        print("Waiting...")
+        time.sleep(10)
+        sc.run_restart_server()
+
+
     for o in cfg:
         for k in key:
+            # 展示用例配置信息
             case = o[k].replace("/", "-")
             print("%s为: %s" % (k, case))
+
         for k in key:
             case = o[k].replace("/", "-")
             if "用例" in k:
                 print("-" * 88)
-            time.sleep(0.38)
+                time.sleep(0.38)
+
+            # 修改为上下班时间进行打卡
             if "上班" in k or "下班" in k:
                 flag_1 = input("是否将服务器时间修改为%s: %s" % (k, case))
                 flag_2 = input("请再次确认")
                 print("+" * 88)
                 if not flag_1 and not flag_2:
-                    # change_all_time(case)
-                    pass
-
+                    change_all_time(case)
+            # 生效当日数据
+            if "生效" in k and case:
+                effective(case)
 
 
 
@@ -104,3 +132,4 @@ if __name__ == '__main__':
     cfg = GetConfig()
     (a, b) = cfg.open_file()
     set_time_while(a, b)
+

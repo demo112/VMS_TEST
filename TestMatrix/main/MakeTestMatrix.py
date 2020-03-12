@@ -1,6 +1,6 @@
 import csv
 from itertools import product, combinations, permutations
-
+from TestMatrix.main import *
 
 class TestMatrix:
     def __init__(self):
@@ -30,8 +30,8 @@ class TestMatrix:
 
     def open_file(self):
         """打开文件"""
-        target = input("请输入需加载的文件名：")
-        with open(target or "1.csv", 'r', encoding="UTF-8") as f:
+        target = CSV_FILE_PATH + input("请输入需加载的文件名：")
+        with open(target or "1.csv", 'r', encoding="UTF-8-sig") as f:
             reader = csv.DictReader(f)
             self.project_list = reader.fieldnames
             key_list = reader.fieldnames
@@ -136,8 +136,8 @@ class TestMatrix:
                     fn += "_"
             return fn
 
-        file_name = make_name() + '.csv'
-        with open(file_name, 'w', encoding='UTF-8', newline='') as f:
+        file_name = CSV_OUTPUT_PATH + make_name() + '.csv'
+        with open(file_name, 'w', encoding='UTF-8-sig', newline='') as f:
             write = csv.writer(f)
             write.writerow(project_list)
             write.writerows(option_list)

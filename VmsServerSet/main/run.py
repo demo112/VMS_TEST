@@ -31,8 +31,8 @@ def run_update_centos_server():
 def change_all_time(time):
     """
     time-> 2008-08-08 08:08:08
-    :param time:
-    :return:
+    :param time: 需要修改的目标时间，修改对象包括，一体机、人脸速通门、考勤服务器
+    :return: None
     """
     time_list = [
         time,
@@ -44,43 +44,73 @@ def change_all_time(time):
         date_time = y + "." + m + "." + d + "-" + time_
         return date_time
 
+    def vms_():
+        """
+        修改一体机时间
+        :return:
+        """
+        vms = ServerSetVMS()
+        ob_vms = vms.login('206.10.30.1')
+        vms.give_order(ob_vms, "date '%s'" % t)
+        return "一体机"
+
+    def face_():
+        """
+        修改人脸速通门时间
+        :return:
+        """
+        et = ServerSetVMS()
+        ob_et = et.login("206.10.0.199")
+        et.give_order(ob_et, "date -s %s" % t2t(t))
+        return "人脸速通门"
+
+    def cent_():
+        """
+        修改考勤服务时间
+        :return:
+        """
+        cent = ServerSetCentOS()
+        cent.run_change_time(t)
+        cent.run_restart_server()
+        return "考勤服务器"
+
+    def for_while(target_device, ts=3):
+        """
+        循环调用一个程序，直至成功或超过尝试次数ts
+        :param target_device: 目标程序
+        :param ts: 尝试次数
+        :return:
+        """
+        while True:
+            if ts == 0:
+                break
+            try:
+                device = target_device
+                print("修改%s时间为：%s" % (device, t))
+                break
+            except Exception as e:
+                print("没有修改成功： %s" % t)
+                print(e)
+                ts -= 1
+                for_while(target_device, ts=ts)
+                print("retry:%d times" % ts)
+
     for t in time_list:
         flag = input("是否修改时间为：%s"
                      "\n【按任意键+回车取消】" % t)
-        print("")
         if flag:
             break
-        try:
-            vms = ServerSetVMS()
-            ob_vms = vms.login('206.10.30.1')
-            vms.give_order(ob_vms, "date '%s'" % t)
-        except Exception as e:
-            print("一体机没有修改成功： %s" % t)
-            print(e)
-
-        try:
-            et = ServerSetVMS()
-            ob_et = et.login("206.10.0.199")
-            et.give_order(ob_et, "date -s %s" % t2t(t))
-        except Exception as e:
-            print("人脸速通门没有修改成功： %s" % t)
-            print(e)
-
-        try:
-            cent = ServerSetCentOS()
-            cent.run_change_time(t)
-            cent.run_restart_server()
-        except Exception as e:
-            print("考勤服务没有修改成功： %s" % t)
-            print(e)
+        for_while(vms_(), 3)
+        for_while(face_(), 3)
+        for_while(cent_(), 3)
 
 
-def set_time_while(key: list, cfg):
+def set_time_while(keys: list, cfgs):
     """
     根据用例设置服务器、一体机、人脸速通门的时间，配合测试
-    :param key:
-    :param cfg:
-    :return:
+    :param keys: 配置项列表
+    :param cfgs: 各配置项选项字典迭代器
+    :return: None
     """
 
     def effective(date):
@@ -97,14 +127,13 @@ def set_time_while(key: list, cfg):
         time.sleep(10)
         sc.run_restart_server()
 
-
-    for o in cfg:
-        for k in key:
+    for o in cfgs:
+        for k in keys:
             # 展示用例配置信息
             case = o[k].replace("/", "-")
             print("%s为: %s" % (k, case))
 
-        for k in key:
+        for k in keys:
             case = o[k].replace("/", "-")
             if "用例" in k:
                 print("-" * 88)
@@ -122,7 +151,6 @@ def set_time_while(key: list, cfg):
                 effective(case)
 
 
-
 if __name__ == '__main__':
     # 修改所有设备时间，要求联通并打开对应设备的Telnet
     # change_all_time()
@@ -130,6 +158,5 @@ if __name__ == '__main__':
     # run_updateCentOS_server()
     # 循环修改设定好时间
     cfg = GetConfig()
-    (a, b) = cfg.open_file()
-    set_time_while(a, b)
-
+    (key, config_list) = cfg.open_file()
+    set_time_while(key, config_list)

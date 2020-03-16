@@ -28,15 +28,12 @@ def run_update_centos_server():
     cent.give_order("cd /root/AttendanceSys/;./server.sh status")
 
 
-def change_all_time(time=None):
+def change_all_time_onetime(time):
     """
     time-> 2008-08-08 08:08:08
     :param time: 需要修改的目标时间，修改对象包括，一体机、人脸速通门、考勤服务器
     :return: None
     """
-    if not time:
-        time = input("请输入修改时间：\n"
-                     "【格式：2000-1-1 08:08:08】")
     time_list = [
         time,
     ]
@@ -159,15 +156,26 @@ def set_time_while(keys: list, cfgs):
                 flag_2 = input("请再次确认")
                 print("+" * 88)
                 if not flag_1 and not flag_2:
-                    change_all_time(case)
+                    change_all_time_onetime(case)
             # 生效当日数据
             if "生效" in k and case:
                 effective(case)
 
 
+def change_all_time_many_times():
+    while True:
+        time = input("【格式：2000-1-1 08:08:08】"
+                     "【退出请输入：结束】\n"
+                     "请输入修改时间：")
+        if time != "结束":
+            change_all_time_onetime(time)
+        else:
+            break
+
+
 if __name__ == '__main__':
     # 修改所有设备时间，要求联通并打开对应设备的Telnet
-    change_all_time()
+    change_all_time_many_times()
     # 自动升级考勤服务，要求，安装包上传至服务器，并尽量删除老版本服务
     # run_updateCentOS_server()
     # 循环修改设定好时间

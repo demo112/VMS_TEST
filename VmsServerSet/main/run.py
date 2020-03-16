@@ -28,12 +28,15 @@ def run_update_centos_server():
     cent.give_order("cd /root/AttendanceSys/;./server.sh status")
 
 
-def change_all_time(time):
+def change_all_time(time=None):
     """
     time-> 2008-08-08 08:08:08
     :param time: 需要修改的目标时间，修改对象包括，一体机、人脸速通门、考勤服务器
     :return: None
     """
+    if not time:
+        time = input("请输入修改时间：\n"
+                     "【格式：2000-1-1 08:08:08】")
     time_list = [
         time,
     ]
@@ -54,7 +57,7 @@ def change_all_time(time):
         vms.give_order(ob_vms, "date '%s'" % t)
         return "一体机"
 
-    def face_():
+    def face_1():
         """
         修改人脸速通门时间
         :return:
@@ -62,7 +65,17 @@ def change_all_time(time):
         et = ServerSetVMS()
         ob_et = et.login("206.10.0.199")
         et.give_order(ob_et, "date -s %s" % t2t(t))
-        return "人脸速通门"
+        return "人脸速通门(206.10.0.199)"
+
+    def face_2():
+        """
+        修改人脸速通门时间
+        :return:
+        """
+        et = ServerSetVMS()
+        ob_et = et.login("206.10.25.3")
+        et.give_order(ob_et, "date -s %s" % t2t(t))
+        return "人脸速通门(206.10.25.3)"
 
     def cent_():
         """
@@ -101,7 +114,8 @@ def change_all_time(time):
         if flag:
             break
         for_while(vms_(), 3)
-        for_while(face_(), 3)
+        for_while(face_1(), 3)
+        for_while(face_2(), 3)
         for_while(cent_(), 3)
 
 
@@ -153,10 +167,10 @@ def set_time_while(keys: list, cfgs):
 
 if __name__ == '__main__':
     # 修改所有设备时间，要求联通并打开对应设备的Telnet
-    # change_all_time()
+    change_all_time()
     # 自动升级考勤服务，要求，安装包上传至服务器，并尽量删除老版本服务
     # run_updateCentOS_server()
     # 循环修改设定好时间
-    cfg = GetConfig()
-    (key, config_list) = cfg.open_file()
-    set_time_while(key, config_list)
+    # cfg = GetConfig()
+    # (key, config_list) = cfg.open_file()
+    # set_time_while(key, config_list)

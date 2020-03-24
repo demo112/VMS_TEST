@@ -185,9 +185,7 @@ class MatrixPriority:
 
         def add_kind(key_list, option_list):
             score = option_list[-1]
-            # mean = max(score)
-            # mean = np.median(score)
-            # print(mean)
+            # 使用正态分布生成优先级
             kind = []
             _ss = 0
             for s in score:
@@ -197,7 +195,6 @@ class MatrixPriority:
             for i in score:
                 M += (i - mean) ** 2
             M = (M / len(score)) ** 0.5
-            print(M)
             for k in score:
                 if int(k) > (M + mean):
                     kind.append('高')
@@ -207,8 +204,6 @@ class MatrixPriority:
                     kind.append("中")
             key_list.append("优先级")
             option_list.append(kind)
-            print(score)
-            print(mean)
             return key_list, option_list
 
         target_file = file_name
@@ -218,7 +213,6 @@ class MatrixPriority:
 
         # 添加标注
         key_list, option_list = add_kind(key_list, option_list)
-        print(key_list, option_list)
         option_list = change_way(option_list)
         return key_list, option_list
 

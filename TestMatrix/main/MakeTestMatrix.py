@@ -144,14 +144,13 @@ class TestMatrix:
             return fn
         # 前缀源文件名称
         father_file = self.target.split(".")[0] + "_"
-        print(father_file)
         # 拼接目标文件路径
         file_name = CSV_OUTPUT_PATH + father_file + make_name() + '.csv'
         with open(file_name, 'w', encoding='UTF-8-sig', newline='') as f:
             write = csv.writer(f)
             write.writerow(project_list)
             write.writerows(option_list)
-            print("测试矩阵生成完毕！")
+            print("%s 生成完毕！" % file_name)
         return file_name
 
     def main(self, filename="1.csv"):

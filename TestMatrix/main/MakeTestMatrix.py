@@ -13,7 +13,7 @@ class TestMatrix:
             ["选项12", "选项23"]
         ]
         self.project_list = ["条件1", "条件2"]
-        self.target = "1.csv"
+        self.target = ""
 
     def make_example(self):
         """生成模版"""
@@ -29,9 +29,14 @@ class TestMatrix:
             # print("输入错误，请重新输入")
             # self.make_example()
 
-    def open_file(self, target="1.csv"):
+    def open_file(self, target=None):
         """打开文件"""
-        target = CSV_FILE_PATH + (input("请输入需加载的文件名：") or self.target or target)
+        if self.target:
+            target = self.target
+        elif not target:
+            target = input("请输入需加载的文件名：")
+        self.target = target
+        target = CSV_FILE_PATH + target
         with open(target, 'r', encoding="UTF-8-sig") as f:
             reader = csv.DictReader(f)
             self.project_list = reader.fieldnames
@@ -139,6 +144,7 @@ class TestMatrix:
             return fn
         # 前缀源文件名称
         father_file = self.target.split(".")[0] + "_"
+        print(father_file)
         # 拼接目标文件路径
         file_name = CSV_OUTPUT_PATH + father_file + make_name() + '.csv'
         with open(file_name, 'w', encoding='UTF-8-sig', newline='') as f:
@@ -149,9 +155,9 @@ class TestMatrix:
         return file_name
 
     def main(self, filename="1.csv"):
+        self.target = filename
         self.make_example()
         self.make_matrix()
-        self.target = filename
         self.write_file()
 
 

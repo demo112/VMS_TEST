@@ -1,5 +1,10 @@
 import csv
+import time
+
+# import numpy as np
+
 from TestMatrix.main.MakeTestMatrix import *
+
 
 class MatrixPriority:
     def __init__(self):
@@ -36,8 +41,9 @@ class MatrixPriority:
                     _list = sorted(set(_list), key=_list.index)  # 去重
                 option_list.append(_list)
             return option_list
+
         if type == "matrix":
-            target = CSV_FILE_PATH + (input("请输入需加载的文件名：") or target)
+            target = CSV_FILE_PATH + (input("请输入需加载的文件名1：") or target)
         elif type == "priority":
             target = CSV_OUTPUT_PATH + target
         else:
@@ -111,6 +117,8 @@ class MatrixPriority:
                     try:
                         pri_dir = self.make_pri_dir(key_list, option_list, pri_list)
                         file_name = self.write_file(key_list, option_list)
+                        matrix1 = TestMatrix()
+                        matrix1.main(file_name)
                         fn = ''
                         ln = len(key_list)
                         if ln > 3:
@@ -139,9 +147,14 @@ class MatrixPriority:
                     else:
                         pass
 
-
-
     def add_score(self, file_name, pri_dir):
+        """
+        为测试矩阵添加系数
+        :param file_name: 文件名称
+        :param pri_dir: 优先级字典
+        :return: 配置项列表，添加了系数的配置项列表
+        """
+
         def change_way(need_change):
             """
             切换矩阵方向
@@ -153,36 +166,61 @@ class MatrixPriority:
                 for y in range(len(need_change)):
                     change_x.append(need_change[y][x])
                 changed.append(change_x)
-            print(changed)
             return changed
 
-        target_file = file_name
-        print(file_name)
-        key_list, option_list, pri_list =self.open_file(target_file, type="priority")
-        # for key_num in range(len(key_list)):
-        #     key = key_list[key_num]
-        #     ops = option_list[key_num]
-        #     score = 0
-        #     for op_num in range(ops):
-        #         ko = key + "_" + op
-        #         score += int(pri_dir[ko])
-        #     score_list.append(str(score))
-        # option_list.append(score_list)
-        scores = []
-        for ops_num in range(len(option_list)):
-            key = key_list[ops_num]
-            ops = option_list[ops_num]
-            for op_num in range(len(ops)):
-                ko = key + "_" + ops[op_num]
-                if len(scores) - 1 >= op_num:
-                    scores[op_num] += int(pri_dir[ko])
+        def add_priority(key_list, option_list):
+            scores = []
+            for ops_num in range(len(option_list)):
+                key = key_list[ops_num]
+                ops = option_list[ops_num]
+                for op_num in range(len(ops)):
+                    ko = key + "_" + ops[op_num]
+                    if len(scores) - 1 >= op_num:
+                        scores[op_num] += int(pri_dir[ko])
+                    else:
+                        scores.insert(op_num, int(pri_dir[ko]))
+            option_list.append(scores)
+            key_list.append("系数")
+            return key_list, option_list
+
+        def add_kind(key_list, option_list):
+            score = option_list[-1]
+            # mean = max(score)
+            # mean = np.median(score)
+            # print(mean)
+            kind = []
+            _ss = 0
+            for s in score:
+                _ss += int(s)
+            mean = _ss / len(score)
+            M = 0
+            for i in score:
+                M += (i - mean) ** 2
+            M = (M / len(score)) ** 0.5
+            print(M)
+            for k in score:
+                if int(k) > (M + mean):
+                    kind.append('高')
+                elif int(k) < (mean - M):
+                    kind.append('低')
                 else:
-                    scores.insert(op_num, int(pri_dir[ko]))
-        option_list.append(scores)
-        key_list.append("系数")
+                    kind.append("中")
+            key_list.append("优先级")
+            option_list.append(kind)
+            print(score)
+            print(mean)
+            return key_list, option_list
+
+        target_file = file_name
+        key_list, option_list, pri_list = self.open_file(target_file, type="priority")
+
+        key_list, option_list = add_priority(key_list, option_list)
+
+        # 添加标注
+        key_list, option_list = add_kind(key_list, option_list)
+        print(key_list, option_list)
         option_list = change_way(option_list)
         return key_list, option_list
-
 
 
 if __name__ == '__main__':

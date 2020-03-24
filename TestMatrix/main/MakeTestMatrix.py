@@ -13,6 +13,7 @@ class TestMatrix:
             ["选项12", "选项23"]
         ]
         self.project_list = ["条件1", "条件2"]
+        self.target = "1.csv"
 
     def make_example(self):
         """生成模版"""
@@ -22,16 +23,16 @@ class TestMatrix:
         if need_or_not == ("1" or "是"):
             self.write_file(None, None)
         elif need_or_not == ("2" or "否"):
-            self.open_file()
+            self.open_file(self.target)
         else:
-            self.open_file()
+            self.open_file(self.target)
             # print("输入错误，请重新输入")
             # self.make_example()
 
-    def open_file(self):
+    def open_file(self, target="1.csv"):
         """打开文件"""
-        target = CSV_FILE_PATH + input("请输入需加载的文件名：")
-        with open(target or "1.csv", 'r', encoding="UTF-8-sig") as f:
+        target = CSV_FILE_PATH + (input("请输入需加载的文件名：") or self.target or target)
+        with open(target, 'r', encoding="UTF-8-sig") as f:
             reader = csv.DictReader(f)
             self.project_list = reader.fieldnames
             key_list = reader.fieldnames
@@ -44,6 +45,7 @@ class TestMatrix:
                     _list.append(r[key])
                 _list = sorted(set(_list), key=_list.index)  # 去重
                 self.option_list.append(_list)
+        self.target = target.split("\\")[-1]
 
     def be_sure(self, checking_list):
         """集中处理异常数据，优化输出内容"""
@@ -126,7 +128,7 @@ class TestMatrix:
             project_list = self.project_list
 
         def make_name():
-            fn = ""
+            fn = ''
             ln = len(project_list)
             if ln > 3:
                 ln = 3
@@ -135,18 +137,21 @@ class TestMatrix:
                 if p < ln - 1:
                     fn += "_"
             return fn
-
-        file_name = CSV_OUTPUT_PATH + make_name() + '.csv'
+        # 前缀源文件名称
+        father_file = self.target.split(".")[0] + "_"
+        # 拼接目标文件路径
+        file_name = CSV_OUTPUT_PATH + father_file + make_name() + '.csv'
         with open(file_name, 'w', encoding='UTF-8-sig', newline='') as f:
             write = csv.writer(f)
             write.writerow(project_list)
             write.writerows(option_list)
             print("测试矩阵生成完毕！")
-        # pass
+        return file_name
 
-    def main(self):
+    def main(self, filename="1.csv"):
         self.make_example()
         self.make_matrix()
+        self.target = filename
         self.write_file()
 
 

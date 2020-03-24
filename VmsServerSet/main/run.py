@@ -1,5 +1,5 @@
 from VmsServerSet.setting.server_class import *
-from TestMatrix.main.config_manager import *
+# from TestMatrix.main.config_manager import *
 
 
 def run_update_centos_server():
